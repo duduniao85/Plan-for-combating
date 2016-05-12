@@ -149,7 +149,7 @@ def getUrlList(pageUrl):
     textdata=urlopen(pageUrl).read()
     soup=BeautifulSoup(textdata,'lxml')
     itemUrlList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > h2 > a')
-    #成交日期
+    #签约日期
     itemDealDate=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > div > div.col-2.fr > div > div:nth-of-type(1) > div')
     #ID
     itemIdList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > h2 > a')
@@ -159,18 +159,29 @@ def getUrlList(pageUrl):
     itemPianquList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > div > div.col-1.fl > div.other > div > a:nth-of-type(2)')
     #楼层/层高
     itemLoucengList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > div > div.col-1.fl > div.other > div')
-
-    itemList=[]
-    for itemUrl,itemDate,itemId,itemQuxian,itemPianqu,itemLouceng in zip(itemUrlList,itemDealDate,itemIdList,itemQuxianList,itemPianquList,itemLoucengList):
+    # 面积
+    itemMianjiList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > h2 > a')
+    # 总价
+    itemZongjiaList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > div > div.col-2.fr > div > div.fr > div')
+    # 单价
+    itemDanjiaList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > div > div.col-2.fr > div > div:nth-of-type(2) > div')
+    itemList =[]
+    for itemUrl,itemDate,itemId,itemQuxian,itemPianqu,itemLouceng,itemMianji,itemZongjia,itemDanjia in \
+            zip(itemUrlList,itemDealDate,itemIdList,itemQuxianList,itemPianquList,itemLoucengList,itemMianjiList,itemZongjiaList,itemDanjiaList):
         temp_strlist=list(itemLouceng.stripped_strings)
         item = {
-            'itemUrl': itemUrl.get('href'),
-            'signDate': itemDate.get_text(),
-            'itemId': itemId.get('key'),
+            'itemurl': itemUrl.get('href'),
+            'signdate': itemDate.get_text(),
+            'itemid': itemId.get('key'),
             'quxian': itemQuxian.get_text(),
             'pianqu': itemPianqu.get_text(),
             'louceng':temp_strlist[3] if (len(temp_strlist) > 3) else '',#不是所有的房子都包含楼层信息，没有则置空
-            'chaoxiang':temp_strlist[5] if (len(temp_strlist) > 5) else ''#不是所有的房子都包含朝向信息，没有则置空
+            'chaoxiang':temp_strlist[5] if (len(temp_strlist) > 5) else '',#不是所有的房子都包含朝向信息，没有则置空
+            'mianji': itemMianji.get_text().split(' ')[2].replace(u'平米',''),
+            'zongjia': list(itemZongjia.stripped_strings)[0],
+            'danjia': list(itemDanjia.stripped_strings)[0],
+            'xiaoqu': itemMianji.get_text().split(' ')[0],
+            'huxing': itemMianji.get_text().split(' ')[1]
         }
         itemList.append(item)
     return itemList
@@ -187,48 +198,20 @@ def getAttr(item_page_url):
     #############################################维度#####################################################
     #二手户成交数据ID
     itemId=soup.select('body > div.cj-wrap > div > div.esf-top > div.cj-cun > div.content > div.houseRecord > span.houseNum')[0].get_text().split(u'：')[1]
-    #小区名称
-    courtName=soup.findAll("a",{"class":"name-xq"})[0].get_text()
-    #户型说明
-    huxing_shi=soup.select('body > div.cj-wrap > div > div.esf-top > div.cj-cun > div.content > div.houseInfo > div.room > div')[0].get_text().split(' ')[0]
-    huxing_ting=soup.select('body > div.cj-wrap > div > div.esf-top > div.cj-cun > div.content > div.houseInfo > div.room > div')[0].get_text().split(' ')[1]
     # 建筑年份
-    # jianzhunianfen=soup.select()
-    # 卖点
-    # maidian=soup.select()
-    # 是否有钥匙
-    # youyaoshi=soup.select()
-    #邻近地铁站通过正则表达式提取
-    #linjindetiezhan=soup.select()
+    jianzhunianfen=soup.findAll('table',class_='aroundInfo')[0].findAll('tr')[1].findAll('td')[3].get_text().strip().replace(u'年建','')
+    # 邻近地铁站通过正则表达式提取
+    linjindetiezhan=soup.findAll('span',class_='fang-subway-ex')
+    linjindetiezhan= linjindetiezhan[0].get_text() if (len(linjindetiezhan) > 0) else ''
+    linjindetiezhan,number = re.subn(r'[0-9]+', '', linjindetiezhan,re.S)
+    linjindetiezhan=linjindetiezhan.replace(u'距离号线','').replace(u'米','')
     # 装修情况
-    # zhuangxiuqingkuang=soup.select()
-    # 地址
-    # dizhi=soup.select()
-    # 面积
-    # mianji=soup.select()
-    # 总价
-    # zongjia=soup.select()
-    # 单价
-    # danjia=soup.select()
-    # 同小区均价
-    # tongxiaoqujunjia=soup.select()
-
+    zhuangxiuqingkuang=soup.findAll('table',class_='aroundInfo')[0].findAll('tr')[2].findAll('td')[1].get_text().strip()
     item_attr={
-            'itemId': itemId,
-            'courtName': courtName,
-            'huxing': huxing_shi+huxing_ting,
-            'chaoxiang': '',
-            'jianzhunianfen': '',
-            'maidian': '',
-            'youyaoshi': '',
-            'linjindetiezhan': '',
-            'zhuangxiuqingkuang': '',
-            'dizhi': '',
-            'mianji': '',
-            'zongjia': '',
-            'danjia': '',
-            'kanfangrenshu': '',
-            'tongxiaoqujunjia': ''
+            'itemId':itemId,
+            'jianzhunianfen':jianzhunianfen,
+            'linjinditie':linjindetiezhan,
+            'zhuangxiuqingkuang': zhuangxiuqingkuang,
     }
     return item_attr
 def unitTest(itemUrl):
@@ -239,12 +222,22 @@ def unitTest(itemUrl):
     """
     textdata=urlopen(itemUrl).read()
     soup=BeautifulSoup(textdata,'lxml')
-    text=soup.select('body > div.cj-wrap > div > div.esf-top > div.cj-cun > div.content > table > tbody > tr:nth-child(3) > td:nth-child(4)')
-    for a in  list(text.stripped_strings):
-        print a
+    #text=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > div > div.col-2.fr > div > div:nth-of-type(2) > div')
+    # 建筑年份
+    jianzhunianfen=soup.findAll('table',class_='aroundInfo')[0].findAll('tr')[1].findAll('td')[3].get_text().strip().replace(u'年建','')
+    # 邻近地铁站通过正则表达式提取
+    linjindetiezhan=soup.findAll('span',class_='fang-subway-ex')
+    linjindetiezhan= linjindetiezhan[0].get_text() if (len(linjindetiezhan) > 0) else ''
+    linjindetiezhan,number = re.subn(r'[0-9]+', '', linjindetiezhan,re.S)
+    linjindetiezhan=linjindetiezhan.replace(u'距离号线','').replace(u'米','')
+    # 装修情况
+    zhuangxiuqingkuang=soup.findAll('table',class_='aroundInfo')[0].findAll('tr')[2].findAll('td')[1].get_text().strip()
+    
+
 
 if __name__ == '__main__':
     #list=getUrlList(r'http://sh.lianjia.com/chengjiao/d20000')
-    #unitTest(r'http://sh.lianjia.com/chengjiao/sh1051315.html')
-    getUrlList(r'http://sh.lianjia.com/chengjiao/')
+    unitTest(r'http://sh.lianjia.com/chengjiao/sh1226691.html')
+    #unitTest(r'http://sh.lianjia.com/chengjiao/')
+    #print pd.DataFrame(getUrlList(r'http://sh.lianjia.com/chengjiao/'))['danjia']
 
