@@ -21,150 +21,151 @@ def unzip(data):
     gz.close()
     return data
 
-def lianjialogin():
-    """
-    摸拟链家用户登录
-    :param username: 登录用户名
-    :param password: 登录密码
-    :return:
-    """
-    #获取Cookiejar对象（存在本机的cookie消息）
-    cookie = cookielib.CookieJar()
-    #自定义opener,并将opener跟CookieJar对象绑定
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
-    #安装opener,此后调用urlopen()时都会使用安装过的opener对象
-    urllib2.install_opener(opener)
+# def lianjialogin():
+#     """
+#     摸拟链家用户登录
+#     :param username: 登录用户名
+#     :param password: 登录密码
+#     :return:
+#     """
+#     #获取Cookiejar对象（存在本机的cookie消息）
+#     cookie = cookielib.CookieJar()
+#     #自定义opener,并将opener跟CookieJar对象绑定
+#     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+#     #安装opener,此后调用urlopen()时都会使用安装过的opener对象
+#     urllib2.install_opener(opener)
+#
+#     home_url = 'http://sh.lianjia.com/'
+#     auth_url = 'https://passport.lianjia.com/cas/login?service=http%3A%2F%2Fsh.lianjia.com%2F'
+#     chengjiao_url = 'http://sh.lianjia.com/chengjiao/'
+#     headers = {
+#         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+#         'Accept-Encoding': 'gzip, deflate, sdch',
+#         'Accept-Language': 'zh-CN,zh;q=0.8',
+#         'Cache-Control': 'no-cache',
+#         'Connection': 'keep-alive',
+#         'Content-Type': 'application/x-www-form-urlencoded',
+#         'Host': 'passport.lianjia.com',
+#         'Pragma': 'no-cache',
+#         'Upgrade-Insecure-Requests': '1',
+#         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36'
+#     }
+#     # 获取lianjia_uuid
+#     req = urllib2.Request('http://sh.lianjia.com/')
+#     opener.open(req)
+#     # 初始化表单
+#     req = urllib2.Request(auth_url, headers=headers)
+#     result = opener.open(req)
+#     #print(cookie)
+#     # 获取cookie和lt值
+#     pattern = re.compile(r'JSESSIONID=(.*)')
+#     jsessionid = pattern.findall(result.info().getheader('Set-Cookie').split(';')[0])[0]
+#     # print jsessionid
+#     html_content = result.read()
+#     html_content = unzip(html_content)
+#     #print html_content.decode('UTF8')
+#     pattern = re.compile(r'value=\"(LT-.*)\"')
+#     lt = pattern.findall(html_content)[0]
+#
+#     pattern = re.compile(r'name="execution" value="(.*)"')
+#     execution = pattern.findall(html_content)[0]
+#
+#     # print(cookie)
+#     # opener.open(lj_uuid_url)
+#     # print(cookie)
+#     # opener.open(api_url)
+#     # print(cookie)
+#
+#     # data
+#     data = {
+#         'username': '18616153298',
+#         'password': 'Wuxi1107',
+#         # 'service': 'http://bj.lianjia.com/',
+#         # 'isajax': 'true',
+#         # 'remember': 1,
+#         'execution': execution,
+#         '_eventId': 'submit',
+#         'lt': lt,
+#         'verifyCode': '',
+#         'redirect': '',
+#     }
+#     # urllib进行编码
+#     post_data=urllib.urlencode(data)
+#     # header
+#     headers = {
+#         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+#         'Accept-Encoding': 'gzip, deflate',
+#         'Accept-Language': 'zh-CN,zh;q=0.8',
+#         'Cache-Control': 'no-cache',
+#         'Connection': 'keep-alive',
+#         # 'Content-Length': '152',
+#         'Content-Type': 'application/x-www-form-urlencoded',
+#         'Host': 'passport.lianjia.com',
+#         'Origin': 'https://passport.lianjia.com',
+#         'Pragma': 'no-cache',
+#         'Referer': 'https://passport.lianjia.com/cas/login?service=http%3A%2F%2Fsh.lianjia.com%2F',
+#         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36',
+#         'Upgrade-Insecure-Requests': '1',
+#         'X-Requested-With': 'XMLHttpRequest',
+#     }
+#
+#     headers2 = {
+#         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+#         'Accept-Encoding': 'gzip, deflate, sdch',
+#         'Accept-Language': 'zh-CN,zh;q=0.8',
+#         'Cache-Control': 'no-cache',
+#         'Connection': 'keep-alive',
+#         'Content-Type': 'application/x-www-form-urlencoded',
+#         'Host': 'sh.lianjia.com',
+#         'Pragma': 'no-cache',
+#         'Referer': 'https://passport.lianjia.com/cas/xd/api?name=passport-lianjia-com',
+#         'Upgrade-Insecure-Requests': '1',
+#         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36'
+#     }
+#     req = urllib2.Request(auth_url, post_data, headers)
+#     try:
+#         result = opener.open(req)
+#     except urllib2.HTTPError, e:
+#         print e.getcode()
+#         print e.reason
+#         print e.geturl()
+#         print "-------------------------"
+#         print e.info()
+#         print(e.geturl())
+#         req = urllib2.Request(e.geturl())
+#         result = opener.open(req)
+#         req = urllib2.Request(chengjiao_url)
+#         result = opener.open(req).read()
+#     data = unzip(result.read())
+#     print data
+#     return unzip(result.read())
 
-    home_url = 'http://sh.lianjia.com/'
-    auth_url = 'https://passport.lianjia.com/cas/login?service=http%3A%2F%2Fsh.lianjia.com%2F'
-    chengjiao_url = 'http://sh.lianjia.com/chengjiao/'
-    headers = {
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Encoding': 'gzip, deflate, sdch',
-        'Accept-Language': 'zh-CN,zh;q=0.8',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Host': 'passport.lianjia.com',
-        'Pragma': 'no-cache',
-        'Upgrade-Insecure-Requests': '1',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36'
-    }
-    # 获取lianjia_uuid
-    req = urllib2.Request('http://sh.lianjia.com/')
-    opener.open(req)
-    # 初始化表单
-    req = urllib2.Request(auth_url, headers=headers)
-    result = opener.open(req)
-    #print(cookie)
-    # 获取cookie和lt值
-    pattern = re.compile(r'JSESSIONID=(.*)')
-    jsessionid = pattern.findall(result.info().getheader('Set-Cookie').split(';')[0])[0]
-    # print jsessionid
-    html_content = result.read()
-    html_content = unzip(html_content)
-    #print html_content.decode('UTF8')
-    pattern = re.compile(r'value=\"(LT-.*)\"')
-    lt = pattern.findall(html_content)[0]
 
-    pattern = re.compile(r'name="execution" value="(.*)"')
-    execution = pattern.findall(html_content)[0]
-
-    # print(cookie)
-    # opener.open(lj_uuid_url)
-    # print(cookie)
-    # opener.open(api_url)
-    # print(cookie)
-
-    # data
-    data = {
-        'username': '18616153298',
-        'password': 'Wuxi1107',
-        # 'service': 'http://bj.lianjia.com/',
-        # 'isajax': 'true',
-        # 'remember': 1,
-        'execution': execution,
-        '_eventId': 'submit',
-        'lt': lt,
-        'verifyCode': '',
-        'redirect': '',
-    }
-    # urllib进行编码
-    post_data=urllib.urlencode(data)
-    # header
-    headers = {
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Encoding': 'gzip, deflate',
-        'Accept-Language': 'zh-CN,zh;q=0.8',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        # 'Content-Length': '152',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Host': 'passport.lianjia.com',
-        'Origin': 'https://passport.lianjia.com',
-        'Pragma': 'no-cache',
-        'Referer': 'https://passport.lianjia.com/cas/login?service=http%3A%2F%2Fsh.lianjia.com%2F',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36',
-        'Upgrade-Insecure-Requests': '1',
-        'X-Requested-With': 'XMLHttpRequest',
-    }
-
-    headers2 = {
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Encoding': 'gzip, deflate, sdch',
-        'Accept-Language': 'zh-CN,zh;q=0.8',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Host': 'sh.lianjia.com',
-        'Pragma': 'no-cache',
-        'Referer': 'https://passport.lianjia.com/cas/xd/api?name=passport-lianjia-com',
-        'Upgrade-Insecure-Requests': '1',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36'
-    }
-    req = urllib2.Request(auth_url, post_data, headers)
-    try:
-        result = opener.open(req)
-    except urllib2.HTTPError, e:
-        print e.getcode()
-        print e.reason
-        print e.geturl()
-        print "-------------------------"
-        print e.info()
-        print(e.geturl())
-        req = urllib2.Request(e.geturl())
-        result = opener.open(req)
-        req = urllib2.Request(chengjiao_url)
-        result = opener.open(req).read()
-    data = unzip(result.read())
-    print data
-    return unzip(result.read())
-
-
-def getUrlList(pageUrl):
+def getUrlList(headers,pageUrl):
     """
     传入指定的需要抓取的页面
     返回需要抓取的明细项url列表,以及url列表对应明细项的签约日期
     """
-    textdata=urlopen(pageUrl).read()
+    req = urllib2.Request(pageUrl, headers = headers)
+    textdata=urllib2.urlopen(req).read()
     soup=BeautifulSoup(textdata,'lxml')
     itemUrlList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > h2 > a')
     #签约日期
-    itemDealDate=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > div > div.col-2.fr > div > div:nth-of-type(1) > div')
+    itemDealDate=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel.clear > div.col-2.fr > div > div:nth-of-type(1) > div')
     #ID
     itemIdList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > h2 > a')
     #区县
-    itemQuxianList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > div > div.col-1.fl > div.other > div > a:nth-of-type(1)')
+    itemQuxianList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel.clear > div.col-1.fl > div.other > div > a:nth-of-type(1)')
     #片区
-    itemPianquList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > div > div.col-1.fl > div.other > div > a:nth-of-type(2)')
+    itemPianquList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel.clear > div.col-1.fl > div.other > div > a:nth-of-type(2)')
     #楼层/层高
-    itemLoucengList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > div > div.col-1.fl > div.other > div')
+    itemLoucengList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel.clear > div.col-1.fl > div.other > div')
     # 面积
-    itemMianjiList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > h2 > a')
+    itemMianjiList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel.clear > h2 > a')
     # 总价
-    itemZongjiaList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > div > div.col-2.fr > div > div.fr > div')
+    itemZongjiaList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel.clear > div.col-2.fr > div > div.fr > div')
     # 单价
-    itemDanjiaList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel > div > div.col-2.fr > div > div:nth-of-type(2) > div')
+    itemDanjiaList=soup.select('body > div.wrapper > div.main-box.clear > div > div.list-wrap > ul > li > div.info-panel.clear > div.col-2.fr > div > div:nth-of-type(2) > div')
     itemList =[]
     for itemUrl,itemDate,itemId,itemQuxian,itemPianqu,itemLouceng,itemMianji,itemZongjia,itemDanjia in \
             zip(itemUrlList,itemDealDate,itemIdList,itemQuxianList,itemPianquList,itemLoucengList,itemMianjiList,itemZongjiaList,itemDanjiaList):
@@ -235,9 +236,10 @@ def unitTest(itemUrl):
     
 
 
-if __name__ == '__main__':
-    #list=getUrlList(r'http://sh.lianjia.com/chengjiao/d20000')
-    unitTest(r'http://sh.lianjia.com/chengjiao/sh1226691.html')
+if __name__ == '__main___':
+    list=getUrlList(r'http://sh.lianjia.com/chengjiao/d1')
+    print list
+    #unitTest(r'http://sh.lianjia.com/chengjiao/sh1226691.html')
     #unitTest(r'http://sh.lianjia.com/chengjiao/')
     #print pd.DataFrame(getUrlList(r'http://sh.lianjia.com/chengjiao/'))['danjia']
 

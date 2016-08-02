@@ -20,14 +20,30 @@ itemList=[]#成交详情列表
 #secondHandHouseDeal.lianjialogin()
 #取得需要爬取的ID列表和明细url列表
 #50页提交一次
+
+from selenium import webdriver
+driver=webdriver.Chrome()
+driver.get("https://passport.lianjia.com/cas/login?service=http://user.sh.lianjia.com/index/ershou")
+#xueqiu login
+driver.find_element_by_name("username").clear()
+driver.find_element_by_name("username").send_keys("18616153298")
+driver.find_element_by_name("password").clear()
+driver.find_element_by_name("password").send_keys("Wuxi1107")
+driver.find_element_by_xpath("//*[@id='loginUserForm']/ul/li[5]/button").submit()
+time.sleep(1)
+cookie = [item["name"] + "=" + item["value"] for item in driver.get_cookies()]
+print cookie
 starttime= time.clock()
 db_engine=create_engine('oracle+cx_oracle://quant:1@127.0.0.1:1521/XE?charset=utf8', echo=True)
 conn=db_engine.connect()
-i=1701
+i=1
+cookiestr = ';'.join(item for item in cookie)
+headers = {'cookie':cookiestr}
 while(i<=2800):
     prefix=r'http://sh.lianjia.com'
     url=r'http://sh.lianjia.com/chengjiao/d'+str(i)
-    scndHs4Sale=secondHandHouseDeal.getUrlList(url)
+    scndHs4Sale=secondHandHouseDeal.getUrlList(headers,url)
+
     itemBaseList.extend(scndHs4Sale)
     if len(scndHs4Sale)== 0 :#
         break
@@ -38,13 +54,14 @@ while(i<=2800):
                                                                'signdate':VARCHAR2(64),'zongjia':VARCHAR2(64),'quxian':VARCHAR2(64),'xiaoqu':VARCHAR2(64),\
                                                                              'huxing':VARCHAR2(64)})
         itemBaseList=[]
+        time.sleep(1)
     for item in scndHs4Sale:
         #print item.get('itemId')
         itemUrl=prefix+item.get('itemurl')
         itemUrlList.add(itemUrl)
     i+=1
 
-# dfChengjiao.to_csv(r'd:\temp\chengjiao.csv',encoding='gb2312',index=False)
+dfChengjiao.to_csv(r'd:\temp\chengjiao.csv',encoding='gb2312',index=False)
 conn.close()
 endtime=time.clock()
 print u'总耗时'+str(endtime-starttime)+u'秒'
@@ -61,3 +78,4 @@ print 'done!'
 # endtime=time.clock()
 # print endtime-starttime
 # print data
+driver.quit()
