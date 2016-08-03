@@ -61,7 +61,7 @@ while(i<=2800):
         itemUrlList.add(itemUrl)
     i+=1
 
-dfChengjiao.to_csv(r'd:\temp\chengjiao.csv',encoding='gb2312',index=False)
+#dfChengjiao.to_csv(r'd:\temp\chengjiao.csv',encoding='gb2312',index=False)
 conn.close()
 endtime=time.clock()
 print u'总耗时'+str(endtime-starttime)+u'秒'
